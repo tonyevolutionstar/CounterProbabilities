@@ -5,64 +5,65 @@ import math
 import matplotlib.pyplot as plt
 import time
 
+
 # receives a charecter and checks if we got accent and replace with a charecter without a accent, example À - A
 def accents(c):
     # based on table http://accentcodes.com/
     # http://accentcodes.com/cutout_chart.html
 
     # ord converts a char to ascii number 
-    number_ascii = ord(c.lower())
-    
-    # A
-    a_ascii = [192, 224, 193, 226, 195, 227, 196, 228]
+    number_ascii = ord(c.upper())
+
+    ## A  
+    a_ascii = [192, 193, 194, 195, 224, 196, 197, 198]
     for letter_a in a_ascii:
         if letter_a == number_ascii:
             return "a"
 
     # E
-    e_ascii = [200, 232, 201, 233, 202, 234, 203, 235]
+    e_ascii = [200, 201, 202, 203]
     for letter_e in e_ascii:
         if letter_e == number_ascii:
             return "e"
 
     # I
-    i_ascii = [204, 236, 205, 237, 206, 238, 207, 239]
+    i_ascii = [204, 205, 206, 207]
     for letter_i in i_ascii: 
         if letter_i == number_ascii:
             return "i"
 
     # O
-    o_ascii = [210, 242, 211, 243, 212, 244, 213, 245, 214, 246]
+    o_ascii = [210, 211, 212, 213, 213]
     for letter_o in o_ascii:
         if letter_o == number_ascii:
             return "o"
 
     # U
-    u_ascii = [217, 249, 218, 250, 219, 251, 220, 252]
+    u_ascii = [217, 218, 219, 220]
     for letter_u in u_ascii:
         if letter_u == number_ascii:
             return "u"
 
     # Y
-    y_ascii = [221, 253, 159, 255]
+    y_ascii = [221, 253, 159]
     for letter_y in y_ascii:
         if letter_y == number_ascii:
             return "y"
 
     # Ç
-    c_ascii = [199, 231]
+    c_ascii = [140, 199]
     for letter_c in c_ascii:
         if letter_c == number_ascii:
             return "c"
 
     return c
-    
+
+
 def exact_counter(letter, c):
-    if c != 'Æ':
-        if c in letter:
-            letter[c] = letter[c] + 1
-        else: 
-            letter[c] = 1
+    if c in letter:
+        letter[c] = letter[c] + 1
+    else: 
+        letter[c] = 1
 
     return letter
 
@@ -89,7 +90,6 @@ def fp_increment(X, d):
 def csursos_counter(exactCounter, csursoCounter, c):
     d = 0
     for c in exactCounter:
-       
         x = fp_increment(0, d)
         if c in csursoCounter:
             csursoCounter[c] = csursoCounter[c] + fp_increment(0, d)
@@ -144,6 +144,7 @@ def create_counter():
     file.write("------------------------------\n")
     file.close()
 
+
 def write_counter(book, ntimes, exct_counter, fixed_counter, csursos):
     file = open("results_counters.txt", "a")
     file.write(f"Ntimes: {ntimes}\n")
@@ -153,14 +154,13 @@ def write_counter(book, ntimes, exct_counter, fixed_counter, csursos):
     file.write(f"{mean_ex}, {max_dev_ex}, {mad_ex}, {stdd_ex}\n")
     file.write(f"Fixed probability with 1/8: {fixed_counter}\n")
     mean_fc, max_dev_fc, mad_fc, stdd_fc = statiscs(fixed_counter)
-    file.write(f"{mean_fc}, {max_dev_fc}, {mad_fc}, {stdd_fc}\n")
-    
+    file.write(f"{mean_fc}, {max_dev_fc}, {mad_fc}, {stdd_fc}\n")    
     file.write(f"Csuros: {csursos}\n")
     mean_c, max_dev_c, mad_c, stdd_c = statiscs(csursos)
     file.write(f"{mean_c}, {max_dev_c}, {mad_c}, {stdd_c}\n") 
-    
     file.write("------------------------------\n")
     file.close()
+
 
 def export_image(dir, book, count, exact_counter, fixed_counter, csursos_counter):    
     ex_letter = list(exact_counter.keys())
@@ -169,9 +169,7 @@ def export_image(dir, book, count, exact_counter, fixed_counter, csursos_counter
     fig = plt.figure(figsize = (10, 5))
     
     # creating the bar plot
-    plt.bar(ex_letter, ex_values, color ='green',
-            width = 0.4)
-    
+    plt.bar(ex_letter, ex_values, color ='green', width = 0.4)
     plt.xlabel("Letter")
     plt.ylabel("Qtd")
     plt.title("Exact Counts")
@@ -183,9 +181,7 @@ def export_image(dir, book, count, exact_counter, fixed_counter, csursos_counter
     fig2 = plt.figure(figsize = (10, 5))
     
     # creating the bar plot
-    plt.bar(fx_letter, fx_values, color ='green',
-            width = 0.4)
-    
+    plt.bar(fx_letter, fx_values, color ='green', width = 0.4)
     plt.xlabel("Letter")
     plt.ylabel("Qtd")
     plt.title("Fixed probability with 1/8")
@@ -198,8 +194,7 @@ def export_image(dir, book, count, exact_counter, fixed_counter, csursos_counter
     fig3 = plt.figure(figsize = (10, 5))
     
     # creating the bar plot
-    plt.bar(cs_letter, cs_values, color ='green',
-            width = 0.4)
+    plt.bar(cs_letter, cs_values, color ='green', width = 0.4)
     
     plt.xlabel("Letter")
     plt.ylabel("Qtd")
@@ -207,35 +202,29 @@ def export_image(dir, book, count, exact_counter, fixed_counter, csursos_counter
     plt.savefig(f"{dir}Csursos_count of {book} generated in {count}")
         
         
-        
-
 
 def read_file(text_file, n_times):
     file = open(text_file, "r", encoding='utf-8')
     exactCounter = {}
     fixedCounter = {}
     csursoCounter = {}
-    
-    for line in file:
-        for character in line:
-            # isalpha remove special charecters
-            # https://www.w3schools.com/python/ref_string_isalpha.asp
-            if character.isalpha() == True:
-                #print(character)
-                c = accents(character).upper()
-                l = exact_counter(exactCounter, c)
-                exct_counter = dict(sorted(l.items(), key = lambda x:x[0]))
-                for ntime in range(n_times):
-                    print(f"I'm doing the counter {ntime} \n")
-
+    for ntime in range(n_times):
+        print(f"I'm doing the counter {ntime} \n")
+        for line in file:
+            for character in line:
+                # isalpha remove special charecters
+                # https://www.w3schools.com/python/ref_string_isalpha.asp
+                if character.isalpha() == True:
+                    c = accents(character).upper()
+                    l = exact_counter(exactCounter, c)
+                    exct_counter = dict(sorted(l.items(), key = lambda x:x[0]))
                     fc = fixed_counter(fixedCounter, c)
-
                     fc_counter = dict(sorted(fc.items(), key = lambda x:x[0]))
                     csurso = csursos_counter(exactCounter, csursoCounter, c)
                     csurso_counter = dict(sorted(csurso.items(), key = lambda x:x[0]))
-              
-    file.close()
-    return exct_counter, fc_counter, csurso_counter
+            
+        file.close()
+        return exct_counter, fc_counter, csurso_counter
 
 if __name__ == "__main__":
     create_file()
@@ -244,60 +233,20 @@ if __name__ == "__main__":
     start = time.time()
 
     # books available
-    #text_file = "books/text_test.txt" # for testing
     frank_file = "books/frankenstein.txt" # https://www.gutenberg.org/cache/epub/42324/pg42324.txt # it was removed the header and the footer
-    shake_file = "books/shakespeare.txt" #https://www.gutenberg.org/files/100/100-0.txt
     bible_file = "books/bible.txt" # https://www.gutenberg.org/files/10/10-0.txt
     war_peace_file = "books/war_and_peace.txt" #https://www.gutenberg.org/files/2600/2600-0.txt
-    the_republic = "books/the_Republic.txt" #https://www.gutenberg.org/cache/epub/1497/pg1497.txt
+    david_copperfield = "books/david_coperfield.txt" #https://www.gutenberg.org/files/766/766-0.txt
 
-    ### shakespeare
-    # the counters are implemented in a function read_file 
-    n_times = 1000
-    ex_coutner, fc_counter, csurso_counter = read_file(frank_file, n_times) 
-    write_counter("frankenstein", n_times, ex_coutner, fc_counter, csurso_counter)
-    export_image(dir, "frankenstein", n_times, ex_coutner, fc_counter, csurso_counter)
- 
-    n_times = 10000
-    ex_coutner, fc_counter, csurso_counter = read_file(shake_file, n_times)
-    write_counter("shakespeare", n_times, ex_coutner, fc_counter, csurso_counter)
-    export_image(dir, "shakespeare", n_times, ex_coutner, fc_counter, csurso_counter)
+    list_books = {frank_file:"frankenstein", bible_file:"bible", war_peace_file:"war_and_peace", david_copperfield:"david_copperfield"}
+    n_times = [1000, 10000]
 
-    ### bible
-    # the counters are implemented in a function read_file 
-    n_times = 1000
-    ex_coutner, fc_counter, csurso_counter = read_file(bible_file, n_times) 
-    write_counter("bible", n_times, ex_coutner, fc_counter, csurso_counter)
-    export_image(dir, "bible", n_times, ex_coutner, fc_counter, csurso_counter)
- 
-    n_times = 10000
-    ex_coutner, fc_counter, csurso_counter = read_file(bible_file, n_times)
-    write_counter("bible", n_times, ex_coutner, fc_counter, csurso_counter)
-    export_image(dir, "bible", n_times, ex_coutner, fc_counter, csurso_counter)
+    for ntime in range(len(n_times)):
+        for book in list_books:
+            ex_counter, fc_counter, csurso_counter = read_file(book, n_times[ntime])
+            write_counter(list_books[book], n_times[ntime], ex_counter, fc_counter, csurso_counter)
+            export_image(dir, list_books[book], n_times[ntime], ex_counter, fc_counter, csurso_counter)
 
-    ### war and peace
-    # the counters are implemented in a function read_file 
-    n_times = 1000
-    ex_coutner, fc_counter, csurso_counter = read_file(war_peace_file, n_times) 
-    write_counter("war_and_peace", n_times, ex_coutner, fc_counter, csurso_counter)
-    export_image(dir, "war_and_peace", n_times, ex_coutner, fc_counter, csurso_counter)
- 
-    n_times = 10000
-    ex_coutner, fc_counter, csurso_counter = read_file(frank_file, n_times)
-    write_counter("war_and_peace", n_times, ex_coutner, fc_counter, csurso_counter)
-    export_image(dir, "war_and_peace", n_times, ex_coutner, fc_counter, csurso_counter)
-
-    ### the republic
-    # the counters are implemented in a function read_file 
-    n_times = 1000
-    ex_coutner, fc_counter, csurso_counter = read_file(the_republic, n_times) 
-    write_counter("the_republic", n_times, ex_coutner, fc_counter, csurso_counter)
-    export_image(dir, "the_republic", n_times, ex_coutner, fc_counter, csurso_counter)
- 
-    n_times = 10000
-    ex_coutner, fc_counter, csurso_counter = read_file(the_republic, n_times)
-    write_counter("the_republic", n_times, ex_coutner, fc_counter, csurso_counter)
-    export_image(dir, "the_republic", n_times, ex_coutner, fc_counter, csurso_counter)
 
     stop = time.time() - start
     print(f"program finish in {stop}")
