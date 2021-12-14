@@ -12,7 +12,7 @@ def accents(c):
     # http://accentcodes.com/cutout_chart.html
 
     # ord converts a char to ascii number 
-    number_ascii = ord(c.upper())
+    number_ascii = ord(c)
 
     ## A  
     a_ascii = [192, 193, 194, 195, 224, 196, 197, 198]
@@ -33,7 +33,7 @@ def accents(c):
             return "i"
 
     # O
-    o_ascii = [210, 211, 212, 213, 213]
+    o_ascii = [210, 211, 212, 213, 214]
     for letter_o in o_ascii:
         if letter_o == number_ascii:
             return "o"
@@ -55,15 +55,17 @@ def accents(c):
     for letter_c in c_ascii:
         if letter_c == number_ascii:
             return "c"
+    
 
     return c
 
 
 def exact_counter(letter, c):
-    if c in letter:
-        letter[c] = letter[c] + 1
-    else: 
-        letter[c] = 1
+    if c != "Œ":
+        if c in letter:
+            letter[c] = letter[c] + 1
+        else: 
+            letter[c] = 1
 
     return letter
 
@@ -167,25 +169,26 @@ def export_image(dir, book, count, exact_counter, fixed_counter, csursos_counter
     ex_values = list(exact_counter.values())
     
     fig = plt.figure(figsize = (10, 5))
-    
+
     # creating the bar plot
     plt.bar(ex_letter, ex_values, color ='green', width = 0.4)
     plt.xlabel("Letter")
     plt.ylabel("Qtd")
     plt.title("Exact Counts")
     plt.savefig(f"{dir}Exact_count of {book} generated in {count}")
-
+    plt.close(fig)
+    
     fx_letter = list(fixed_counter.keys())
     fx_values = list(fixed_counter.values())
     
     fig2 = plt.figure(figsize = (10, 5))
-    
     # creating the bar plot
     plt.bar(fx_letter, fx_values, color ='green', width = 0.4)
     plt.xlabel("Letter")
     plt.ylabel("Qtd")
     plt.title("Fixed probability with 1/8")
     plt.savefig(f"{dir}Fixed_probability_ of {book} generated in {count}")
+    plt.close(fig2)
 
 
     cs_letter = list(csursos_counter.keys())
@@ -200,7 +203,7 @@ def export_image(dir, book, count, exact_counter, fixed_counter, csursos_counter
     plt.ylabel("Qtd")
     plt.title("Csursos Counts")
     plt.savefig(f"{dir}Csursos_count of {book} generated in {count}")
-        
+    plt.close(fig3)
         
 
 def read_file(text_file, n_times):
@@ -208,45 +211,53 @@ def read_file(text_file, n_times):
     exactCounter = {}
     fixedCounter = {}
     csursoCounter = {}
-    for ntime in range(n_times):
-        print(f"I'm doing the counter {ntime} \n")
-        for line in file:
-            for character in line:
+    list_char = []
+    for line in file:
+        list_char.append(line)
+    file.close()         
+
+
+    for i in range(0,n_times):
+        print(f"Time {i}\n")
+        for l in list_char:
+            for character in l:
                 # isalpha remove special charecters
                 # https://www.w3schools.com/python/ref_string_isalpha.asp
                 if character.isalpha() == True:
-                    c = accents(character).upper()
+                    c = accents(character.upper()).upper()
+                    list_char.append(character)
                     l = exact_counter(exactCounter, c)
                     exct_counter = dict(sorted(l.items(), key = lambda x:x[0]))
                     fc = fixed_counter(fixedCounter, c)
                     fc_counter = dict(sorted(fc.items(), key = lambda x:x[0]))
                     csurso = csursos_counter(exactCounter, csursoCounter, c)
-                    csurso_counter = dict(sorted(csurso.items(), key = lambda x:x[0]))
-            
-        file.close()
-        return exct_counter, fc_counter, csurso_counter
+                    csurso_counter = dict(sorted(csurso.items(), key = lambda x:x[0]))   
+        if i == n_times:
+            return exct_counter, fc_counter, csurso_counter
 
 if __name__ == "__main__":
     create_file()
     create_counter()
     dir = "resultsImages/"
-    start = time.time()
 
     # books available
-    frank_file = "books/frankenstein.txt" # https://www.gutenberg.org/cache/epub/42324/pg42324.txt # it was removed the header and the footer
+    #frank_file = "books/frankenstein.txt" # https://www.gutenberg.org/cache/epub/42324/pg42324.txt # it was removed the header and the footer
     bible_file = "books/bible.txt" # https://www.gutenberg.org/files/10/10-0.txt
     war_peace_file = "books/war_and_peace.txt" #https://www.gutenberg.org/files/2600/2600-0.txt
-    david_copperfield = "books/david_coperfield.txt" #https://www.gutenberg.org/files/766/766-0.txt
+    david_copperfield = "books/david_copperfield.txt" #https://www.gutenberg.org/files/766/766-0.txt
+    anna_karenina = "books/anna_karenina.txt" #https://www.gutenberg.org/files/1399/1399-0.txt
 
-    list_books = {frank_file:"frankenstein", bible_file:"bible", war_peace_file:"war_and_peace", david_copperfield:"david_copperfield"}
+    list_books = {anna_karenina:"anna_karenina", bible_file:"bible", war_peace_file:"war_and_peace", david_copperfield:"david_copperfield"}
     n_times = [1000, 10000]
 
-    for ntime in range(len(n_times)):
-        for book in list_books:
-            ex_counter, fc_counter, csurso_counter = read_file(book, n_times[ntime])
-            write_counter(list_books[book], n_times[ntime], ex_counter, fc_counter, csurso_counter)
-            export_image(dir, list_books[book], n_times[ntime], ex_counter, fc_counter, csurso_counter)
+    for book in list_books:
+        for i in n_times:
+            print(f"Time {i}")
+            start = time.time()
+            print(f"Book {book}\n")
+            ex_counter, fc_counter, csurso_counter = read_file(book, i)
+            write_counter(list_books[book], i, ex_counter, fc_counter, csurso_counter)
+            export_image(dir, list_books[book], i, ex_counter, fc_counter, csurso_counter)
 
-
-    stop = time.time() - start
-    print(f"program finish in {stop}")
+            stop = time.time() - start
+            print(f"Book {book} finish in {round(stop, 3)} seconds\n")
