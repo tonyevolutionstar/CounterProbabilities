@@ -122,15 +122,8 @@ def statiscs(counter):
     max_dev = 0 # maximal deviation
     mad = 0 # mean absolute deviation
     stdd_dev = 0 #standard deviation
-    highest = 10
-    lowest = 0
-    
 
     for i in counter:
-        if counter[i] > highest:
-            highest = counter[i]
-        if counter[i] < lowest:
-            lowest = counter[i]
         max_dev_ = abs(counter[i] - mean)
         if max_dev_ > max_dev: 
             max_dev = max_dev_
@@ -138,8 +131,10 @@ def statiscs(counter):
         mad += abs(counter[i] - mean)
         stdd_dev += pow((counter[i] - mean), 2)
 
-    return highest, lowest, (round(mean, 3), round(max_dev, 3), round((1/len(counter) * mad), 3), round(math.sqrt(1/len(counter)*stdd_dev), 3))
 
+    return (round(mean, 3), round(max_dev, 3), round((1/len(counter) * mad), 3), round(math.sqrt(1/len(counter)*stdd_dev), 3))
+
+# create file counter results
 def create_counter():
     file = open("results_counters.txt", "w")
     file.write("Layout of file\n")
@@ -147,32 +142,45 @@ def create_counter():
     file.write("Ntimes: X \n")
     file.write("Name of book: X - Total of letters: X \n")
     file.write("Exact Counter: \n")
-    file.write("LOWEST, HIGHEST, MEAN, MAX_DEV, MAD, STDD_DEV\n")
+    file.write("Highest letter: X value: X\n")
+    file.write("Lowest letter: X value: X\n")
+    file.write("MEAN, MAX_DEV, MAD, STDD_DEV\n")
     file.write("Fixed probability with 1/8: \n")
-    file.write("LOWEST, HIGHEST, MEAN, MAX_DEV, MAD, STDD_DEV\n")
+    file.write("Highest letter: X value: X\n")
+    file.write("Lowest letter: X value: X\n")
+    file.write("MEAN, MAX_DEV, MAD, STDD_DEV\n")
     file.write("Csuros: \n")
-    file.write("LOWEST, HIGHEST, MEAN, MAX_DEV, MAD, STDD_DEV\n")
+    file.write("Highest letter: X value: X\n")
+    file.write("Lowest letter: X value: X\n")
+    file.write("MEAN, MAX_DEV, MAD, STDD_DEV\n")
     file.write("------------------------------\n")
     file.close()
 
-
+# write information about counters and statics 
 def write_counter(book, ntimes, exct_counter, fixed_counter, csursos):
     file = open("results_counters.txt", "a")
     file.write(f"Ntimes: {ntimes}\n")
     file.write(f"Name of book: {book} - Total of letters: {sum(exct_counter.values())}\n")
     file.write(f"Exact Counter: {exct_counter}\n")
-    highest_ex, lowest_ex, mean_ex, max_dev_ex, mad_ex, stdd_ex = statiscs(exct_counter)
+    file.write(f"Highest letter: {max(exct_counter, key=exct_counter.get)} value: {exct_counter.get(max(exct_counter, key=exct_counter.get))}\n")
+    file.write(f"Lowest letter: {min(exct_counter, key=exct_counter.get)} value: {exct_counter.get(min(exct_counter, key=exct_counter.get))}\n")
+    mean_ex, max_dev_ex, mad_ex, stdd_ex = statiscs(exct_counter)
     file.write(f"{mean_ex}, {max_dev_ex}, {mad_ex}, {stdd_ex}\n")
     file.write(f"Fixed probability with 1/8: {fixed_counter}\n")
+    file.write(f"Highest letter: {max(fixed_counter, key=fixed_counter.get)} value: {fixed_counter.get(max(fixed_counter, key=fixed_counter.get))}\n")
+    file.write(f"Lowest letter: {min(fixed_counter, key=fixed_counter.get)} value: {fixed_counter.get(min(fixed_counter, key=fixed_counter.get))}\n")
     mean_fc, max_dev_fc, mad_fc, stdd_fc = statiscs(fixed_counter)
     file.write(f"{mean_fc}, {max_dev_fc}, {mad_fc}, {stdd_fc}\n")    
     file.write(f"Csuros: {csursos}\n")
+    file.write(f"Highest letter: {max(csursos, key=csursos.get)} value: {csursos.get(max(csursos, key=csursos.get))}\n")
+    file.write(f"Lowest letter: {min(csursos, key=csursos.get)} value: {csursos.get(min(csursos, key=csursos.get))}\n")
     mean_c, max_dev_c, mad_c, stdd_c = statiscs(csursos)
     file.write(f"{mean_c}, {max_dev_c}, {mad_c}, {stdd_c}\n") 
     file.write("------------------------------\n")
     file.close()
 
 
+# create a visualization of char of each count and each counter and each book
 def export_image(dir, book, count, exact_counter, fixed_counter, csursos_counter):    
     ex_letter = list(exact_counter.keys())
     ex_values = list(exact_counter.values())
@@ -215,6 +223,7 @@ def export_image(dir, book, count, exact_counter, fixed_counter, csursos_counter
     plt.close(fig3)
         
 
+# read a book file and calculate the counters
 def read_file(text_file, n_times):
     file = open(text_file, "r", encoding='utf-8')
     exactCounter = {}
@@ -248,18 +257,40 @@ def read_file(text_file, n_times):
  
     return exct_counter, dict(sorted(fc.items(), key = lambda x:x[0])), dict(sorted(csurso.items(), key = lambda x:x[0]))   
 
+def test():
+    test = "books/test.txt"
+
+
+    n_times = [1000, 10000]
+    for i in n_times:
+        start = time.time()
+
+        print(f"Book {test}\n")
+        ex_counter, fc_counter, csurso_counter = read_file(test, i)
+
+        # set counts in exact count - multiply all counts with the number of times
+        for c in ex_counter:
+            ex_counter[c] = ex_counter[c]*i
+
+        write_counter("test", i, ex_counter, fc_counter, csurso_counter)
+        export_image(dir, "test", i, ex_counter, fc_counter, csurso_counter)
+
+        stop = time.time() - start
+        print(f"Book test finish in {round(stop, 3)} seconds\n")
+
+
+
 if __name__ == "__main__":
     create_file()
     create_counter()
     dir = "resultsImages/"
 
     # books available
-    #frank_file = "books/frankenstein.txt" # https://www.gutenberg.org/cache/epub/42324/pg42324.txt # it was removed the header and the footer
     bible_file = "books/bible.txt" # https://www.gutenberg.org/files/10/10-0.txt
     war_peace_file = "books/war_and_peace.txt" #https://www.gutenberg.org/files/2600/2600-0.txt
     david_copperfield = "books/david_copperfield.txt" #https://www.gutenberg.org/files/766/766-0.txt
     anna_karenina = "books/anna_karenina.txt" #https://www.gutenberg.org/files/1399/1399-0.txt
-
+ 
     list_books = {anna_karenina:"anna_karenina", bible_file:"bible", war_peace_file:"war_and_peace", david_copperfield:"david_copperfield"}
     
     n_times = [1000, 10000]
