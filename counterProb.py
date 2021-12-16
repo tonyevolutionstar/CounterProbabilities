@@ -12,7 +12,7 @@ def accents(c):
     # http://accentcodes.com/cutout_chart.html
 
     # ord converts a char to ascii number 
-    number_ascii = ord(c)
+    number_ascii = ord(c.upper())
 
     ## A  
     a_ascii = [192, 193, 194, 195, 224, 196, 197, 198]
@@ -55,49 +55,51 @@ def accents(c):
     for letter_c in c_ascii:
         if letter_c == number_ascii:
             return "c"
-    
 
     return c
 
 
 def exact_counter(letter, c):
-    if c != "Œ":
-        if c in letter:
-            letter[c] = letter[c] + 1
-        else: 
-            letter[c] = 1
+    if c in letter:
+        letter[c] = letter[c] + 1
+    else: 
+        letter[c] = 1
 
     return letter
 
 
-def fixed_counter(fixedCounter, c):
+def fixed_counter(fixedCounter, c, n_times):
     p = 1/8
-    number_rand = random.random() # generates a number random between 0, 1 only counts if the number generated is less than the p 
-    if number_rand < p: 
-        exact_counter(fixedCounter, c)
+    for i in range(n_times):
+        number_rand = random.random() # generates a number random between 0, 1 only counts if the number generated is less than the p 
+        if number_rand < p: 
+            if c in fixedCounter:
+                fixedCounter[c] = fixedCounter[c] + 1
+            else:
+                fixedCounter[c] = 1
 
     return fixedCounter
 
 # implementation of floating point of csursos counter according to the slides 
-def fp_increment(X, d):
+def fp_increment(X, d, n_times):
     m = pow(2, d)
     t = X/m 
+    
     while t > 0:
-        if random.randint(0, 1) == 1: 
-            return X
-        t = t - 1
+        for i in range(n_times):
+            if random.randint(0, 1) == 1: 
+                return X
+            t = t - 1
 
     return X + 1
 
-def csursos_counter(exactCounter, csursoCounter, c):
-    d = 0
-    for c in exactCounter:
-        x = fp_increment(0, d)
-        if c in csursoCounter:
-            csursoCounter[c] = csursoCounter[c] + fp_increment(0, d)
-        else:
-            csursoCounter[c] = x
-        d += 1
+def csursos_counter(csursoCounter, c, n_times):
+    x =  fp_increment(1, 20, n_times)
+
+    if c in csursoCounter:
+        csursoCounter[c] = csursoCounter[c] + x
+    else:
+        csursoCounter[c] = x
 
     return csursoCounter
    
@@ -120,8 +122,15 @@ def statiscs(counter):
     max_dev = 0 # maximal deviation
     mad = 0 # mean absolute deviation
     stdd_dev = 0 #standard deviation
+    highest = 10
+    lowest = 0
+    
 
     for i in counter:
+        if counter[i] > highest:
+            highest = counter[i]
+        if counter[i] < lowest:
+            lowest = counter[i]
         max_dev_ = abs(counter[i] - mean)
         if max_dev_ > max_dev: 
             max_dev = max_dev_
@@ -129,7 +138,7 @@ def statiscs(counter):
         mad += abs(counter[i] - mean)
         stdd_dev += pow((counter[i] - mean), 2)
 
-    return (round(mean, 3), round(max_dev, 3), round((1/len(counter) * mad), 3), round(math.sqrt(1/len(counter)*stdd_dev), 3))
+    return highest, lowest, (round(mean, 3), round(max_dev, 3), round((1/len(counter) * mad), 3), round(math.sqrt(1/len(counter)*stdd_dev), 3))
 
 def create_counter():
     file = open("results_counters.txt", "w")
@@ -138,11 +147,11 @@ def create_counter():
     file.write("Ntimes: X \n")
     file.write("Name of book: X - Total of letters: X \n")
     file.write("Exact Counter: \n")
-    file.write("MEAN, MAX_DEV, MAD, STDD_DEV\n")
+    file.write("LOWEST, HIGHEST, MEAN, MAX_DEV, MAD, STDD_DEV\n")
     file.write("Fixed probability with 1/8: \n")
-    file.write("MEAN, MAX_DEV, MAD, STDD_DEV\n")
+    file.write("LOWEST, HIGHEST, MEAN, MAX_DEV, MAD, STDD_DEV\n")
     file.write("Csuros: \n")
-    file.write("MEAN, MAX_DEV, MAD, STDD_DEV\n")
+    file.write("LOWEST, HIGHEST, MEAN, MAX_DEV, MAD, STDD_DEV\n")
     file.write("------------------------------\n")
     file.close()
 
@@ -152,7 +161,7 @@ def write_counter(book, ntimes, exct_counter, fixed_counter, csursos):
     file.write(f"Ntimes: {ntimes}\n")
     file.write(f"Name of book: {book} - Total of letters: {sum(exct_counter.values())}\n")
     file.write(f"Exact Counter: {exct_counter}\n")
-    mean_ex, max_dev_ex, mad_ex, stdd_ex = statiscs(exct_counter)
+    highest_ex, lowest_ex, mean_ex, max_dev_ex, mad_ex, stdd_ex = statiscs(exct_counter)
     file.write(f"{mean_ex}, {max_dev_ex}, {mad_ex}, {stdd_ex}\n")
     file.write(f"Fixed probability with 1/8: {fixed_counter}\n")
     mean_fc, max_dev_fc, mad_fc, stdd_fc = statiscs(fixed_counter)
@@ -211,29 +220,33 @@ def read_file(text_file, n_times):
     exactCounter = {}
     fixedCounter = {}
     csursoCounter = {}
-    list_char = []
+    list_file = []
+
     for line in file:
-        list_char.append(line)
-    file.close()         
-
-
-    for i in range(0,n_times):
-        print(f"Time {i}\n")
-        for l in list_char:
-            for character in l:
-                # isalpha remove special charecters
-                # https://www.w3schools.com/python/ref_string_isalpha.asp
-                if character.isalpha() == True:
-                    c = accents(character.upper()).upper()
-                    list_char.append(character)
+        for character in line:
+            # isalpha remove special charecters
+            # https://www.w3schools.com/python/ref_string_isalpha.asp
+            if character.isalpha() == True:
+                c = accents(character).upper()
+                if c != "Œ":
                     l = exact_counter(exactCounter, c)
                     exct_counter = dict(sorted(l.items(), key = lambda x:x[0]))
-                    fc = fixed_counter(fixedCounter, c)
-                    fc_counter = dict(sorted(fc.items(), key = lambda x:x[0]))
-                    csurso = csursos_counter(exactCounter, csursoCounter, c)
-                    csurso_counter = dict(sorted(csurso.items(), key = lambda x:x[0]))   
-        if i == n_times:
-            return exct_counter, fc_counter, csurso_counter
+        list_file.append(line)
+    file.close()      
+
+    
+    for line2 in list_file:
+        for character in line2:
+            # isalpha remove special charecters
+            # https://www.w3schools.com/python/ref_string_isalpha.asp
+            if character.isalpha() == True:
+                c = accents(character).upper()
+                if c != "Œ":
+                    fc = fixed_counter(fixedCounter, c, n_times)
+                    csurso = csursos_counter(csursoCounter, c, n_times)
+
+ 
+    return exct_counter, dict(sorted(fc.items(), key = lambda x:x[0])), dict(sorted(csurso.items(), key = lambda x:x[0]))   
 
 if __name__ == "__main__":
     create_file()
@@ -248,6 +261,7 @@ if __name__ == "__main__":
     anna_karenina = "books/anna_karenina.txt" #https://www.gutenberg.org/files/1399/1399-0.txt
 
     list_books = {anna_karenina:"anna_karenina", bible_file:"bible", war_peace_file:"war_and_peace", david_copperfield:"david_copperfield"}
+    
     n_times = [1000, 10000]
 
     for book in list_books:
@@ -256,6 +270,11 @@ if __name__ == "__main__":
             start = time.time()
             print(f"Book {book}\n")
             ex_counter, fc_counter, csurso_counter = read_file(book, i)
+
+            # set counts in exact count - multiply all counts with the number of times
+            for c in ex_counter:
+                ex_counter[c] = ex_counter[c]*i
+
             write_counter(list_books[book], i, ex_counter, fc_counter, csurso_counter)
             export_image(dir, list_books[book], i, ex_counter, fc_counter, csurso_counter)
 
