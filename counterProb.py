@@ -58,7 +58,7 @@ def accents(c):
 
     return c
 
-
+# implementation of exact counter, receive a dictionary and the char, return dictionary
 def exact_counter(letter, c):
     if c in letter:
         letter[c] = letter[c] + 1
@@ -67,7 +67,7 @@ def exact_counter(letter, c):
 
     return letter
 
-
+# implementation of fixed counter probability with 1/8, receive a dictionary and the char, return dictionary
 def fixed_counter(fixedCounter, c, n_times):
     p = 1/8
     for i in range(n_times):
@@ -93,6 +93,7 @@ def fp_increment(X, d, n_times):
 
     return X + 1
 
+# implementation of csursos counter, receive a dictionary and the char, return dictionary
 def csursos_counter(csursoCounter, c, n_times):
     x =  fp_increment(1, 20, n_times)
 
@@ -103,18 +104,6 @@ def csursos_counter(csursoCounter, c, n_times):
 
     return csursoCounter
    
-
-def create_file(): 
-    file = open("results.csv", "w")
-    file.write("exact_counter, fixed_prob, csurso_prob\n")
-    file.close()
-
-
-# maybe change this 
-def write_file(exact, fixed_prob, decrease_prob):
-    file = open("results.csv", "a")
-    file.write(f"{exact}, {fixed_prob}, {decrease_prob}\n")
-    file.close()
 
 # function for statiscs of each counter to write on a file
 def statiscs(counter):
@@ -250,52 +239,19 @@ def read_file(text_file, n_times):
             # https://www.w3schools.com/python/ref_string_isalpha.asp
             if character.isalpha() == True:
                 c = accents(character).upper()
-                if c != "Œ":
+                if c != "Œ": # because sometimes appear this char
                     fc = fixed_counter(fixedCounter, c, n_times)
                     csurso = csursos_counter(csursoCounter, c, n_times)
 
  
     return exct_counter, dict(sorted(fc.items(), key = lambda x:x[0])), dict(sorted(csurso.items(), key = lambda x:x[0]))   
 
-def test():
-    test = "books/test.txt"
-
-
-    n_times = [1000, 10000]
-    for i in n_times:
-        start = time.time()
-
-        print(f"Book {test}\n")
-        ex_counter, fc_counter, csurso_counter = read_file(test, i)
-
-        # set counts in exact count - multiply all counts with the number of times
-        for c in ex_counter:
-            ex_counter[c] = ex_counter[c]*i
-
-        write_counter("test", i, ex_counter, fc_counter, csurso_counter)
-        export_image(dir, "test", i, ex_counter, fc_counter, csurso_counter)
-
-        stop = time.time() - start
-        print(f"Book test finish in {round(stop, 3)} seconds\n")
-
-
-def books_english():
-    # books available
-    bible_file = "books/bible.txt" # https://www.gutenberg.org/files/10/10-0.txt
-    war_peace_file = "books/war_and_peace.txt" #https://www.gutenberg.org/files/2600/2600-0.txt
-    david_copperfield = "books/david_copperfield.txt" #https://www.gutenberg.org/files/766/766-0.txt
-    anna_karenina = "books/anna_karenina.txt" #https://www.gutenberg.org/files/1399/1399-0.txt
- 
-    list_books = {anna_karenina:"anna_karenina", bible_file:"bible", war_peace_file:"war_and_peace", david_copperfield:"david_copperfield"}
-    
-
 
 if __name__ == "__main__":
-    create_file()
     create_counter()
     dir = "resultsImages/"
     
-     # books available
+    # books available
     frenchbook = "books/francebook.txt" 
     germanbook = "books/germanbook.txt"
     portuguesebook = "books/portuguesebook.txt" 
@@ -304,7 +260,6 @@ if __name__ == "__main__":
 
     list_books = {englishbook:"english", frenchbook:"french", spannishbook:"spannish", portuguesebook:"book"}
     
-   
     n_times = [1000, 10000]
 
     for book in list_books:
