@@ -157,10 +157,10 @@ def create_counter():
     file.close()
 
 # write information about counters and statics 
-def write_counter(book, ntimes, exct_counter, fixed_counter, csursos):
+def write_counter(book, ntimes, exct_counter, fixed_counter, csursos, exc):
     file = open("results_counters.txt", "a")
     file.write(f"Ntimes: {ntimes}\n")
-    file.write(f"Name of book: {book} - Total of letters: {sum(exct_counter.values())}\n")
+    file.write(f"Name of book: {book} - Total of letters: {sum(exct_counter.values())} - Execution time: {exc}\n")
     file.write(f"Exact Counter: {exct_counter}\n")
     file.write(f"Highest letter: {max(exct_counter, key=exct_counter.get)} value: {exct_counter.get(max(exct_counter, key=exct_counter.get))}\n")
     file.write(f"Lowest letter: {min(exct_counter, key=exct_counter.get)} value: {exct_counter.get(min(exct_counter, key=exct_counter.get))}\n")
@@ -279,12 +279,7 @@ def test():
         print(f"Book test finish in {round(stop, 3)} seconds\n")
 
 
-
-if __name__ == "__main__":
-    create_file()
-    create_counter()
-    dir = "resultsImages/"
-
+def books_english():
     # books available
     bible_file = "books/bible.txt" # https://www.gutenberg.org/files/10/10-0.txt
     war_peace_file = "books/war_and_peace.txt" #https://www.gutenberg.org/files/2600/2600-0.txt
@@ -293,6 +288,23 @@ if __name__ == "__main__":
  
     list_books = {anna_karenina:"anna_karenina", bible_file:"bible", war_peace_file:"war_and_peace", david_copperfield:"david_copperfield"}
     
+
+
+if __name__ == "__main__":
+    create_file()
+    create_counter()
+    dir = "resultsImages/"
+    
+     # books available
+    frenchbook = "books/francebook.txt" 
+    germanbook = "books/germanbook.txt"
+    portuguesebook = "books/portuguesebook.txt" 
+    spannishbook = "books/spannishbook.txt" 
+    englishbook = "books/anna_karenina.txt"
+
+    list_books = {englishbook:"english", frenchbook:"french", spannishbook:"spannish", portuguesebook:"book"}
+    
+   
     n_times = [1000, 10000]
 
     for book in list_books:
@@ -306,8 +318,9 @@ if __name__ == "__main__":
             for c in ex_counter:
                 ex_counter[c] = ex_counter[c]*i
 
-            write_counter(list_books[book], i, ex_counter, fc_counter, csurso_counter)
+            stop = time.time() - start
+
+            write_counter(list_books[book], i, ex_counter, fc_counter, csurso_counter, round(stop, 3))
             export_image(dir, list_books[book], i, ex_counter, fc_counter, csurso_counter)
 
-            stop = time.time() - start
             print(f"Book {book} finish in {round(stop, 3)} seconds\n")
