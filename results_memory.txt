@@ -1,0 +1,40 @@
+Book: english
+Memory of Exact Counter: 1184
+Counter: 1000
+Memory of Fixed Counter: 1184
+Memory of Csuros Counter: 1184
+Book: english
+Memory of Exact Counter: 1184
+Counter: 10000
+Memory of Fixed Counter: 1184
+Memory of Csuros Counter: 1184
+Book: french
+Memory of Exact Counter: 1184
+Counter: 1000
+Memory of Fixed Counter: 1184
+Memory of Csuros Counter: 1184
+Book: french
+Memory of Exact Counter: 1184
+Counter: 10000
+Memory of Fixed Counter: 1184
+Memory of Csuros Counter: 1184
+Book: spannish
+Memory of Exact Counter: 1184
+Counter: 1000
+Memory of Fixed Counter: 1184
+Memory of Csuros Counter: 1184
+Book: spannish
+Memory of Exact Counter: 1184
+Counter: 10000
+Memory of Fixed Counter: 1184
+Memory of Csuros Counter: 1184
+Book: portuguese
+Memory of Exact Counter: 1184
+Counter: 1000
+Memory of Fixed Counter: 1184
+Memory of Csuros Counter: 1184
+Book: portuguese
+Memory of Exact Counter: 1184
+Counter: 10000
+Memory of Fixed Counter: 1184
+Memory of Csuros Counter: 1184

@@ -61,21 +61,9 @@ def accents(c):
     if number_ascii == 209:
         return "n"
 
-<<<<<<< Updated upstream
-# implementation of exact counter, receive a dictionary and the char, return dictionary
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
     return c
 
 # implementation of exact counter
-=======
-# implementation of exact counter, receive a dictionary and the char, return dictionary
->>>>>>> 3e9f0664d6edc89c438482b2b0678a97d4bbdf76
-=======
-# implementation of exact counter, receive a dictionary and the char, return dictionary
->>>>>>> 3e9f0664d6edc89c438482b2b0678a97d4bbdf76
->>>>>>> Stashed changes
 def exact_counter(letter, c):
     if c in letter:
         letter[c] = letter[c] + 1
@@ -84,19 +72,7 @@ def exact_counter(letter, c):
 
     return letter
 
-<<<<<<< Updated upstream
-# implementation of fixed counter probability with 1/8, receive a dictionary and the char, return dictionary
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
 # implementation of fixed probability with 1/8
-=======
-# implementation of fixed counter probability with 1/8, receive a dictionary and the char, return dictionary
->>>>>>> 3e9f0664d6edc89c438482b2b0678a97d4bbdf76
-=======
-# implementation of fixed counter probability with 1/8, receive a dictionary and the char, return dictionary
->>>>>>> 3e9f0664d6edc89c438482b2b0678a97d4bbdf76
->>>>>>> Stashed changes
 def fixed_counter(fixedCounter, c, n_times):
     p = 1/8
     for i in range(n_times):
@@ -122,21 +98,9 @@ def fp_increment(X, d, n_times):
 
     return X + 1
 
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
 def csuros_counter(csurosCounter, c, n_times, m, d):
     start = time.time()
     x =  fp_increment(m, d, n_times)
-=======
-=======
->>>>>>> 3e9f0664d6edc89c438482b2b0678a97d4bbdf76
->>>>>>> Stashed changes
-# implementation of csursos counter, receive a dictionary and the char, return dictionary
-def csursos_counter(csursoCounter, c, n_times):
-    x =  fp_increment(1, 20, n_times)
->>>>>>> 3e9f0664d6edc89c438482b2b0678a97d4bbdf76
 
     if c in csurosCounter:
         csurosCounter[c] = csurosCounter[c] + x
@@ -146,10 +110,6 @@ def csursos_counter(csursoCounter, c, n_times):
     return csurosCounter
    
 
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
 def create_file(): 
     file = open("results.csv", "w")
     file.write("Name:")
@@ -202,11 +162,6 @@ def write_file_memory(book, count, exact, fixed, csuros):
     file.close()
 
 
-=======
->>>>>>> 3e9f0664d6edc89c438482b2b0678a97d4bbdf76
-=======
->>>>>>> 3e9f0664d6edc89c438482b2b0678a97d4bbdf76
->>>>>>> Stashed changes
 # function for statiscs of each counter to write on a file
 def statiscs(counter):
     mean = sum(counter.values())/len(counter)
@@ -342,9 +297,8 @@ def read_file(text_file, n_times, m, d):
         for character in line2:
             if character.isalpha() == True:
                 c = accents(character).upper()
-                if c != "Œ": # because sometimes appear this char
+                if c != "Œ":
                     fc = fixed_counter(fixedCounter, c, n_times)
-<<<<<<< HEAD
                     time_fx = round(time.time() - start_fx, 3)
 
     #third loop to calculate csuros              
@@ -358,9 +312,6 @@ def read_file(text_file, n_times, m, d):
                     time_cs = round(time.time() - start_cs, 3)
     
 
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
     time_executation(n_times, time_ex, time_fx, time_cs)
     return exct_counter, dict(sorted(fc.items(), key = lambda x:x[0])), dict(sorted(csuros.items(), key = lambda x:x[0]))   
 
@@ -380,18 +331,10 @@ def main(englishbook, frenchbook, spannishbook, portuguesebook):
             write_file_results(list_books[book], i, ex_counter, fc_counter, cs_counter)
             write_file_memory(list_books[book], i, ex_counter, fc_counter, cs_counter)
             export_image(dir, list_books[book], i, ex_counter, fc_counter, cs_counter)
-=======
-                    csurso = csursos_counter(csursoCounter, c, n_times)
 
- 
-    return exct_counter, dict(sorted(fc.items(), key = lambda x:x[0])), dict(sorted(csurso.items(), key = lambda x:x[0]))   
->>>>>>> 3e9f0664d6edc89c438482b2b0678a97d4bbdf76
-
-=======
->>>>>>> 3e9f0664d6edc89c438482b2b0678a97d4bbdf76
->>>>>>> Stashed changes
 
 if __name__ == "__main__":
+    create_file()
     create_counter()
     create_file_memory()
     create_file_time()
@@ -401,31 +344,5 @@ if __name__ == "__main__":
     frenchbook = "books/francebook.txt" 
     portuguesebook = "books/portuguesebook.txt" 
     spannishbook = "books/spannishbook.txt" 
-<<<<<<< HEAD
     englishbook = "books/bible.txt"
     main(englishbook, frenchbook, spannishbook, portuguesebook)
-=======
-    englishbook = "books/anna_karenina.txt"
-
-    list_books = {englishbook:"english", frenchbook:"french", spannishbook:"spannish", portuguesebook:"book"}
-    
-    n_times = [1000, 10000]
-
-    for book in list_books:
-        for i in n_times:
-            print(f"Time {i}")
-            start = time.time()
-            print(f"Book {book}\n")
-            ex_counter, fc_counter, csurso_counter = read_file(book, i)
-
-            # set counts in exact count - multiply all counts with the number of times
-            for c in ex_counter:
-                ex_counter[c] = ex_counter[c]*i
-
-            stop = time.time() - start
-
-            write_counter(list_books[book], i, ex_counter, fc_counter, csurso_counter, round(stop, 3))
-            export_image(dir, list_books[book], i, ex_counter, fc_counter, csurso_counter)
-
-            print(f"Book {book} finish in {round(stop, 3)} seconds\n")
->>>>>>> 3e9f0664d6edc89c438482b2b0678a97d4bbdf76
