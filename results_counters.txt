@@ -1,4 +1,3 @@
-Layout of file
 ------------------------------
 Ntimes: X 
 Name of book: X - Total of letters: X 
